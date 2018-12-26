@@ -33,7 +33,7 @@ get_employees <- function(user=NULL,password=NULL){
     purrr::map_df(., `[`, c('employeeId')) %>%
     dplyr::bind_rows()
   df <- employees$employeeId %>%
-    purrr::map(., function(x) paste0('https://api.bamboohr.com/api/gateway.php/propellerpdx/v1/employees/',x,'?fields=firstName,lastName,location,department,hireDate,jobTitle,Supervisor,supervisorEId,workEmail,customProratedUtilizationHours,customUtilizationGoalof1900hours,employmentHistoryStatus,terminationDate,lastChanged')) %>%
+    purrr::map(., function(x) paste0('https://api.bamboohr.com/api/gateway.php/propellerpdx/v1/employees/',x,'?fields=customHarvestID,firstName,lastName,location,department,hireDate,jobTitle,Supervisor,supervisorEId,workEmail,customProratedUtilizationHours,customUtilizationGoalof1900hours,employmentHistoryStatus,terminationDate,lastChanged')) %>%
     purrr::map(., function(x) httr::GET(x,
                                         httr::add_headers(Accept = "application/json"),
                                         httr::authenticate(user=paste0(user), password=paste0(password)))) %>%
@@ -45,9 +45,9 @@ get_employees <- function(user=NULL,password=NULL){
     dplyr::bind_rows()
   df <- df %>%
     dplyr::mutate(Name = paste0(firstName,' ',lastName)) %>%
+    dplyr::mutate(lastChanged = lubridate::ymd_hms(lastChanged)) %>%
     dplyr::mutate_at(dplyr::vars(colnames(df)[stringr::str_detect(names(df),'Date')]),dplyr::funs(lubridate::ymd(.))) %>%
     dplyr::mutate_at(dplyr::vars('customProratedUtilizationHours','customUtilizationGoalof1900hours'),dplyr::funs(as.numeric(.))) %>%
-    dplyr::mutate_at(dplyr::vars('id','supervisorEId'),dplyr::funs(as.integer(.)))
-  df$lastChanged <- lubridate::ymd_hms(df$lastChanged)
+    dplyr::mutate_at(dplyr::vars('id','supervisorEId','customHarvestID'),dplyr::funs(as.integer(.)))
   return(df)
 }
