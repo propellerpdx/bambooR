@@ -2,6 +2,8 @@
 
 export(get_bench)
 export(get_employees)
+export(get_pto)
+export(get_utilization)
 import(dplyr)
 import(httr)
 import(jsonlite)
