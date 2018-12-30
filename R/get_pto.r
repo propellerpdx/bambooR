@@ -26,8 +26,8 @@
 #' @export
 get_pto <- function(user=NULL,password=NULL){
   time_off <- httr::GET(paste0('https://api.bamboohr.com/api/gateway.php/propellerpdx/v1/time_off/requests/?status=approved&start=',lubridate::floor_date(lubridate::today(),'year'),'&end=',lubridate::ceiling_date(lubridate::today(),'year')-1),
-                                      httr::add_headers(Accept = "application/json"),
-                                      httr::authenticate(user=paste0(user), password=paste0(password))) %>%
+                        httr::add_headers(Accept = "application/json"),
+                        httr::authenticate(user=paste0(user), password=paste0(password))) %>%
     httr::content(.,as='text',type='json',encoding='UTF-8') %>%
     jsonlite::fromJSON(.,simplifyDataFrame=F)
   time_off_days <- dplyr::bind_cols(
@@ -39,7 +39,7 @@ get_pto <- function(user=NULL,password=NULL){
       purrr::map(.,'dates') %>%
       purrr::map_df(., function(x) unlist(x) %>% dplyr::as_data_frame(.)) %>% dplyr::rename('Hours'='value'))
   time_off <- dplyr::bind_cols(time_off %>%
-                                 purrr::map_df(., `[`, c('id','employeeId','start','end','created')),
+                                 purrr::map_df(., `[`, c('id','employeeId')),
                                time_off %>%
                                  purrr::map(.,'status') %>%
                                  purrr::map_df(., `[`, c('lastChanged','status')),
@@ -49,13 +49,9 @@ get_pto <- function(user=NULL,password=NULL){
                                time_off %>%
                                  purrr::map(.,'amount') %>%
                                  purrr::map_df(., `[`, c('unit','amount')))
-  time_off <- dplyr::inner_join(time_off,time_off_days) %>%
-    dplyr::mutate(Start_Date = lubridate::ymd(start),
-                  End_Date = lubridate::ymd(end),
-                  Created_Date = lubridate::ymd(created),
-                  Updated_Date = lubridate::ymd(lastChanged),
-                  Spent_Date = lubridate::ymd(lastChanged)) %>%
+  check <- dplyr::inner_join(time_off,time_off_days) %>%
+    dplyr::mutate(Spent_Date = lubridate::ymd(Date),
+                  Updated_Date = lubridate::ymd(lastChanged)) %>%
     dplyr::rename('Bamboo_ID'='id','Employee_ID'='employeeId','Status'='status','PTO_Type'='name','Hours_Unit'='unit','Total_Amount'='amount') %>%
-    dplyr::select(Bamboo_ID,Employee_ID,Start_Date,End_Date,Created_Date,Updated_Date,Spent_Date,Status,PTO_Type,Total_Amount,Hours)
-  return(time_off)
+    dplyr::select(Bamboo_ID,Employee_ID,Spent_Date,Updated_Date,Status,PTO_Type,Total_Amount,Hours)  return(time_off)
 }
