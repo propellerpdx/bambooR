@@ -50,9 +50,11 @@ get_pto <- function(user=NULL,password=NULL){
                                  purrr::map(.,'amount') %>%
                                  purrr::map_df(., `[`, c('unit','amount')))
   time_off <- dplyr::inner_join(time_off,time_off_days) %>%
-    dplyr::mutate(Spent_Date = lubridate::ymd(Date),
-                  PTO_updatedDate = lubridate::ymd(lastChanged)) %>%
-    dplyr::rename('PTO_ID'='id','Employee_bambooID'='employeeId','PTO_Status'='status','PTO_Type'='name','PTO_timesUnit'='unit','PTO_Time'='amount') %>%
-    dplyr::select(PTO_ID,Employee_bambooID,Spent_Date,PTO_updatedDate,PTO_Status,PTO_Type,PTO_timesUnit,PTO_Time)
+    dplyr::rename('PTO_ID'='id','Spent_Date'='Date','PTO_updatedDate'='lastChanged','Employee_bambooID'='employeeId','PTO_Status'='status','PTO_Type'='name','PTO_timesUnit'='unit','PTO_Time'='amount') %>%
+    dplyr::select(PTO_ID,Employee_bambooID,Spent_Date,PTO_updatedDate,PTO_Status,PTO_Type,PTO_timesUnit,PTO_Time,Hours) %>%
+    dplyr::mutate_at(dplyr::vars('PTO_ID','Employee_bambooID'),dplyr::funs(as.integer(.))) %>%
+    dplyr::mutate_at(dplyr::vars(colnames(df)[stringr::str_detect(names(df),'Date')]),dplyr::funs(lubridate::ymd(.))) %>%
+    dplyr::mutate_at(dplyr::vars('PTO_Time','Hours'),dplyr::funs(as.numeric(.)))
   return(time_off)
 }
+
