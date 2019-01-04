@@ -25,14 +25,9 @@
 #' @import jsonlite
 #' @export
 get_bench <- function(user=NULL,password=NULL){
-  employees <- httr::GET('https://api.bamboohr.com/api/gateway.php/propellerpdx/v1/meta/users/',
-                         httr::add_headers(Accept = "application/json"),
-                         httr::authenticate(user=paste0(user), password=paste0(password))) %>%
-    httr::content(.,as='text',type='json',encoding='UTF-8') %>%
-    jsonlite::fromJSON(.,simplifyDataFrame=F) %>%
-    purrr::map_df(., `[`, c('employeeId')) %>%
-    dplyr::bind_rows()
-  df <- employees$employeeId %>%
+  employees <- bambooR::get_employees(user=user,
+                                      password=password)
+  df <- employees$Employee_bambooID %>%
     purrr::map(., function(x) paste0('https://api.bamboohr.com/api/gateway.php/propellerpdx/v1/employees/',x,'/tables/customBenchTime')) %>%
     purrr::map(., function(x) httr::GET(x,
                                       httr::add_headers(Accept = "application/json"),
@@ -42,5 +37,7 @@ get_bench <- function(user=NULL,password=NULL){
     purrr::flatten_df() %>%
     dplyr::select(-id) %>%
     dplyr::mutate_at(dplyr::vars(colnames(df)[stringr::str_detect(names(df),'date')]),dplyr::funs(lubridate::ymd(.))) %>%
-    dplyr::mutate_at(dplyr::vars(c('customHours')),dplyr::funs(as.numeric(.)))
+    dplyr::mutate_at(dplyr::vars(c('customHours')),dplyr::funs(as.numeric(.))) %>%
+    dplyr::rename('Employee_bambooID'='employeeId','Bench_startDate'='customStartdate','Bench_endDate'='customEnddate1','Bench_hoursCap'='customHours')
+  return(df)
 }
