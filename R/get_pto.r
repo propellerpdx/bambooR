@@ -51,8 +51,8 @@ get_pto <- function(user=NULL,password=NULL){
                                  purrr::map_df(., `[`, c('unit','amount')))
   time_off <- dplyr::inner_join(time_off,time_off_days) %>%
     dplyr::mutate(Spent_Date = lubridate::ymd(Date),
-                  Updated_Date = lubridate::ymd(lastChanged)) %>%
-    dplyr::rename('Entry_ID'='id','Bamboo_ID'='employeeId','Status'='status','PTO_Type'='name','Hours_Unit'='unit','Total_Amount'='amount') %>%
-    dplyr::select(Entry_ID,Bamboo_ID,Spent_Date,Updated_Date,Status,PTO_Type,Total_Amount,Hours)
+                  PTO_updatedDate = lubridate::ymd(lastChanged)) %>%
+    dplyr::rename('PTO_ID'='id','Employee_bambooID'='employeeId','PTO_Status'='status','PTO_Type'='name','PTO_timesUnit'='unit','PTO_Time'='amount') %>%
+    dplyr::select(PTO_ID,Employee_bambooID,Spent_Date,PTO_updatedDate,PTO_Status,PTO_Type,PTO_timesUnit,PTO_Time)
   return(time_off)
 }
