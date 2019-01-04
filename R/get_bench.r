@@ -24,10 +24,11 @@
 #' @import stringr
 #' @import jsonlite
 #' @export
-get_bench <- function(user=NULL,password=NULL){
-  employees <- bambooR::get_employees(user=user,
-                                      password=password)
-  df <- employees$Employee_bambooID %>%
+get_bench <- function(user=NULL,password=NULL,employee_ids=NULL){
+  if(is.null(employee_ids)==T){
+  employee_ids <- bambooR::get_employees(user=user,
+                                      password=password) %>% .$Employee_bambooID}
+  df <- employee_ids %>%
     purrr::map(., function(x) paste0('https://api.bamboohr.com/api/gateway.php/propellerpdx/v1/employees/',x,'/tables/customBenchTime')) %>%
     purrr::map(., function(x) httr::GET(x,
                                       httr::add_headers(Accept = "application/json"),
