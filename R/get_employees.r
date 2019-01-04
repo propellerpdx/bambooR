@@ -44,10 +44,24 @@ get_employees <- function(user=NULL,password=NULL){
     purrr::map(.,function(x) jsonlite::fromJSON(x,simplifyDataFrame=T)) %>%
     dplyr::bind_rows()
   df <- df %>%
-    dplyr::mutate(Name = paste0(firstName,' ',lastName)) %>%
+    dplyr::mutate(Employee_Name = paste0(firstName,' ',lastName)) %>%
     dplyr::mutate(lastChanged = lubridate::ymd_hms(lastChanged)) %>%
     dplyr::mutate_at(dplyr::vars(colnames(df)[stringr::str_detect(names(df),'Date')]),dplyr::funs(lubridate::ymd(.))) %>%
     dplyr::mutate_at(dplyr::vars('customProratedUtilizationHours','customUtilizationGoalof1900hours'),dplyr::funs(as.numeric(.))) %>%
-    dplyr::mutate_at(dplyr::vars('id','supervisorEId','customHarvestID'),dplyr::funs(as.integer(.)))
+    dplyr::mutate_at(dplyr::vars('id','supervisorEId','customHarvestID'),dplyr::funs(as.integer(.))) %>%
+    dplyr::filter(terminationDate >= lubridate::floor_date(lubridate::today(),unit='year') | is.na(terminationDate)) %>%
+    dplyr::filter(id != '73') %>%
+    dplyr::rename('Employee_bambooID'='id',
+                  'Employee_harvestID'='customHarvestID',
+                  'Employee_Location'='location',
+                  'Employee_Department'='department',
+                  'Employee_hireDate' = 'hireDate',
+                  'Employee_jobTitle' = 'jobTitle',
+                  'Employee_Manager' = 'Supervisor',
+                  'Employee_managerID'='supervisorEId',
+                  'Employee_Email' = 'workEmail',
+                  'Employee_terminationDate'='terminationDate',
+                  'Employee_updatedDate'='lastChanged') %>%
+    dplyr::select(Employee_Name,Employee_bambooID,Employee_harvestID,Employee_hireDate,Employee_terminationDate,Employee_updatedDate,Employee_Location,Employee_Department,Employee_jobTitle,Employee_Email,Employee_Manager,Employee_managerID)
   return(df)
 }
