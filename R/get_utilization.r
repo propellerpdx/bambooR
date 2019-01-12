@@ -21,18 +21,13 @@
 #' @import dplyr
 #' @import jsonlite
 #' @export
-get_utilization <- function(user=NULL,password=NULL, employee_id=NULL){
+get_utilization <- function(user=NULL,password=NULL, employee_id=NULL,year=NULL){
   if(is.null(employee_id)){
-    employee_id <- httr::GET('https://api.bamboohr.com/api/gateway.php/propellerpdx/v1/meta/users/',
-                             httr::add_headers(Accept = "application/json"),
-                             httr::authenticate(user=paste0(user), password=paste0(password))) %>%
-      httr::content(.,as='text',type='json',encoding='UTF-8') %>%
-      jsonlite::fromJSON(.,simplifyDataFrame=F) %>%
-      purrr::map_df(., `[`, c('employeeId')) %>%
-      dplyr::bind_rows() %>%
-      .$employeeId
+    employees <- bambooR::get_employees(user=keyring::key_list('bamboo_rest_api')[2],
+                                        password=keyring::key_get('bamboo_rest_api',paste0(keyring::key_list('bamboo_rest_api')[2])))
+    Employee_bambooID <- employees$Employee_bambooID
   }
-  df <- employee_id %>%
+  df <- Employee_bambooID %>%
     purrr::map(., function(x) paste0('https://api.bamboohr.com/api/gateway.php/propellerpdx/v1/employees/',x,'/tables/customUtilization/')) %>%
     purrr::map(., function(x) httr::GET(x,
                                         httr::add_headers(Accept = "application/json"),
@@ -41,6 +36,19 @@ get_utilization <- function(user=NULL,password=NULL, employee_id=NULL){
     purrr::map(., function(x) jsonlite::fromJSON(x,simplifyDataFrame=T)) %>%
     purrr::flatten() %>%
     dplyr::bind_rows() %>%
-    dplyr::select(dplyr::one_of(c('id','employeeId','customYear','customPrimaryUtilizationTarget','customSecondaryUtilizationTarget')))
+    dplyr::mutate(Year=as.numeric(customYear),
+                  primaryUtilization_Target=as.numeric(customPrimaryUtilizationTarget),
+                  secondaryUtilization_Target=as.numeric(customSecondaryUtilizationTarget),
+                  primaryUtilization_Waved=as.numeric(customPrimaryUtilizationWaved),
+                  secondaryUtilization_Waved=as.numeric(customSecondaryUtilizationWaved),
+                  primaryUtilizaiton_Proration=as.numeric(stringr::str_replace(customPrimaryUtilizationProration,'%',''))) %>%
+    dplyr::rename('Bamboo_utilizationID'='id','Employee_bambooID'='employeeId')
+  df <- dplyr::left_join(df,employees %>% dplyr::select(Employee_bambooID,Employee_hireDate)) %>%
+    dplyr::select(Bamboo_utilizationID,Employee_bambooID,Employee_hireDate,primaryUtilizaiton_Proration,Year,primaryUtilization_Target,secondaryUtilization_Target,primaryUtilization_Waved,secondaryUtilization_Waved)
+  if(is.null(year)==F){
+    df <- df %>%
+      dplyr::filter(Year==as.numeric(year))
+  }
   return(df)
 }
+
