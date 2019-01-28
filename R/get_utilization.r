@@ -22,11 +22,13 @@
 #' @import jsonlite
 #' @export
 get_utilization <- function(user=NULL,password=NULL, employee_id=NULL,year=NULL){
+  # Get all employees by default if targets for a particular employee weren't requested
   if(is.null(employee_id)){
-    employees <- bambooR::get_employees(user=keyring::key_list('bamboo_rest_api')[2],
-                                        password=keyring::key_get('bamboo_rest_api',paste0(keyring::key_list('bamboo_rest_api')[2])))
+    employees <- bambooR::get_employees(user=user,
+                                        password=password)
     Employee_bambooID <- employees$Employee_bambooID
   }
+
   df <- Employee_bambooID %>%
     purrr::map(., function(x) paste0('https://api.bamboohr.com/api/gateway.php/propellerpdx/v1/employees/',x,'/tables/customUtilization/')) %>%
     purrr::map(., function(x) httr::GET(x,
@@ -43,12 +45,15 @@ get_utilization <- function(user=NULL,password=NULL, employee_id=NULL,year=NULL)
                   secondaryUtilization_Waved=as.numeric(customSecondaryUtilizationWaved),
                   primaryUtilizaiton_Proration=as.numeric(stringr::str_replace(customPrimaryUtilizationProration,'%',''))) %>%
     dplyr::rename('Bamboo_utilizationID'='id','Employee_bambooID'='employeeId')
+
   df <- dplyr::left_join(df,employees %>% dplyr::select(Employee_bambooID,Employee_hireDate)) %>%
     dplyr::select(Bamboo_utilizationID,Employee_bambooID,Employee_hireDate,primaryUtilizaiton_Proration,Year,primaryUtilization_Target,secondaryUtilization_Target,primaryUtilization_Waved,secondaryUtilization_Waved)
+
   if(is.null(year)==F){
     df <- df %>%
       dplyr::filter(Year==as.numeric(year))
   }
+
   return(df)
 }
 
