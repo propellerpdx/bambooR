@@ -4,6 +4,7 @@
 #'
 #' @param user Bamboo api user id, register in Bamboo "API Keys"
 #' @param password Bamboo login password
+#' @param verbose a logical; indicates if detailed output from httr calls should be provided; default FALSE
 #' @return tbl_df
 #'
 #' @examples
@@ -24,10 +25,11 @@
 #' @import stringr
 #' @import jsonlite
 #' @export
-get_pto <- function(user=NULL,password=NULL){
+get_pto <- function(user=NULL,password=NULL,verbose=FALSE){
   time_off <- httr::GET(paste0('https://api.bamboohr.com/api/gateway.php/propellerpdx/v1/time_off/requests/?status=approved&start=',lubridate::floor_date(lubridate::today(),'year'),'&end=',lubridate::ceiling_date(lubridate::today(),'year')-1),
                         httr::add_headers(Accept = "application/json"),
-                        httr::authenticate(user=paste0(user), password=paste0(password))) %>%
+                        httr::authenticate(user=paste0(user), password=paste0(password)),
+                        config=config(verbose=verbose)) %>%
     httr::content(.,as='text',type='json',encoding='UTF-8') %>%
     jsonlite::fromJSON(.,simplifyDataFrame=F)
   time_off_days <- dplyr::bind_cols(

@@ -4,12 +4,14 @@
 \alias{get_employees}
 \title{Bamboo API get request wrapper}
 \usage{
-get_employees(user = NULL, password = NULL)
+get_employees(user = NULL, password = NULL, verbose = FALSE)
 }
 \arguments{
 \item{user}{Bamboo api user id, register in Bamboo "API Keys"}
 
 \item{password}{Bamboo login password}
+
+\item{verbose}{a logical; indicates if detailed output from httr calls should be provided; default FALSE}
 }
 \value{
 tbl_df

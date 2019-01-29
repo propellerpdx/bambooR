@@ -4,6 +4,7 @@
 #'
 #' @param user Bamboo api user id, register in Bamboo "API Keys"
 #' @param password Bamboo login password
+#' @param verbose a logical; indicates if detailed output from httr calls should be provided; default FALSE
 #' @return tbl_df
 #'
 #' @examples
@@ -24,7 +25,7 @@
 #' @import stringr
 #' @import jsonlite
 #' @export
-get_bench <- function(user=NULL,password=NULL,employee_ids=NULL){
+get_bench <- function(user=NULL,password=NULL,employee_ids=NULL,verbose=FALSE){
   if(is.null(employee_ids)==T){
   employee_ids <- bambooR::get_employees(user=user,
                                       password=password) %>% .$Employee_bambooID}
@@ -32,7 +33,8 @@ get_bench <- function(user=NULL,password=NULL,employee_ids=NULL){
     purrr::map(., function(x) paste0('https://api.bamboohr.com/api/gateway.php/propellerpdx/v1/employees/',x,'/tables/customBenchTime')) %>%
     purrr::map(., function(x) httr::GET(x,
                                       httr::add_headers(Accept = "application/json"),
-                                      httr::authenticate(user=paste0(user), password=paste0(password)))) %>%
+                                      httr::authenticate(user=paste0(user), password=paste0(password)),
+                                      config=config(verbose=verbose))) %>%
     purrr::map(.,function(x) httr::content(x,as='text',type='json',encoding='UTF-8')) %>%
     purrr::map(.,function(x) jsonlite::fromJSON(x,simplifyDataFrame=T)) %>%
     purrr::flatten_df() %>%

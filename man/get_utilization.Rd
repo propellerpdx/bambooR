@@ -4,12 +4,17 @@
 \alias{get_utilization}
 \title{Bamboo API get request wrapper}
 \usage{
-get_utilization(user = NULL, password = NULL, employee_id = NULL)
+get_utilization(user = NULL, password = NULL, employee_id = NULL,
+  year = NULL, verbose = FALSE)
 }
 \arguments{
 \item{user}{Bamboo api user id, register in Bamboo "API Keys"}
 
 \item{password}{Bamboo login password}
+
+\item{year}{a calendar year; restricts the result set to a particular year if provided; default NULL}
+
+\item{verbose}{a logical; indicates if detailed output from httr calls should be provided; default FALSE}
 }
 \value{
 tbl_df

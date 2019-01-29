@@ -1,9 +1,18 @@
 Package: bambooR
-Title: What the Package Does (one line, title case)
+Title: Helper functions for interaction with the Bamboo HR REST API
 Version: 0.0.0.9000
-Authors@R: person("First", "Last", email = "first.last@example.com", role = c("aut", "cre"))
-Description: What the package does (one paragraph).
+Authors@R: person("Mark", "Druffel", email = "mdruffel@propellerpdx.com", role = c("aut", "cre"))
+Description: Provides various utility functions to facilitate interaction with Bamboo HR's REST API,
+  placing the JSON responses into R dataframes.
 Depends: R (>= 3.4.3)
+Imports:
+  httr,
+  magrittr,
+  purrr,
+  dplyr,
+  lubridate,
+  stringr,
+  jsonlite
 License: What license is it under?
 Encoding: UTF-8
 LazyData: true
