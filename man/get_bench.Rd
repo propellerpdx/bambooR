@@ -4,13 +4,15 @@
 \alias{get_bench}
 \title{Bamboo API get request wrapper}
 \usage{
-get_bench(user = NULL, password = NULL, employee_ids = NULL,
+get_bench(user = NULL, password = NULL, employee_ids = c("all"),
   verbose = FALSE)
 }
 \arguments{
 \item{user}{Bamboo api user id, register in Bamboo "API Keys"}
 
 \item{password}{Bamboo login password}
+
+\item{employee_ids}{an optional list; specifies the employees for which bench time is requested; defaults to c('all') which gets all employee bench time}
 
 \item{verbose}{a logical; indicates if detailed output from httr calls should be provided; default FALSE}
 }

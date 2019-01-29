@@ -23,7 +23,7 @@
 #' @importFrom lubridate ymd
 #' @importFrom lubridate ymd_hms
 #' @import stringr
-#' @import jsonlite
+#' @importFrom jsonlite fromJSON
 #' @export
 get_pto <- function(user=NULL,password=NULL,verbose=FALSE){
   time_off <- httr::GET(paste0('https://api.bamboohr.com/api/gateway.php/propellerpdx/v1/time_off/requests/?status=approved&start=',lubridate::floor_date(lubridate::today(),'year'),'&end=',lubridate::ceiling_date(lubridate::today(),'year')-1),

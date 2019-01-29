@@ -4,13 +4,15 @@
 \alias{get_utilization}
 \title{Bamboo API get request wrapper}
 \usage{
-get_utilization(user = NULL, password = NULL, employee_id = NULL,
-  year = NULL, verbose = FALSE)
+get_utilization(user = NULL, password = NULL,
+  employee_ids = c("all"), year = NULL, verbose = FALSE)
 }
 \arguments{
 \item{user}{Bamboo api user id, register in Bamboo "API Keys"}
 
 \item{password}{Bamboo login password}
+
+\item{employee_ids}{an optional list; specifies the employees for which bench time is requested; defaults to c('all') which gets all employee bench time}
 
 \item{year}{a calendar year; restricts the result set to a particular year if provided; default NULL}
 

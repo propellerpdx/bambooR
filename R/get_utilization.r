@@ -4,7 +4,7 @@
 #'
 #' @param user Bamboo api user id, register in Bamboo "API Keys"
 #' @param password Bamboo login password
-#' @param employee_id
+#' @param employee_ids an optional list; specifies the employees for which bench time is requested; defaults to c('all') which gets all employee bench time
 #' @param year a calendar year; restricts the result set to a particular year if provided; default NULL
 #' @param verbose a logical; indicates if detailed output from httr calls should be provided; default FALSE
 #' @return tbl_df
@@ -22,18 +22,10 @@
 #' @importFrom magrittr %>%
 #' @import purrr
 #' @import dplyr
-#' @import jsonlite
+#' @importFrom jsonlite fromJSON
 #' @export
-get_utilization <- function(user=NULL, password=NULL, employee_id=NULL,year=NULL,verbose=FALSE){
-  # Get all employees by default if targets for a particular employee weren't requested
-  if(is.null(employee_id)){
-    employees <- bambooR::get_employees(user=user,
-                                        password=password,
-                                        verbose=verbose)
-    Employee_bambooID <- employees$Employee_bambooID
-  }
-
-  df <- Employee_bambooID %>%
+get_utilization <- function(user=NULL, password=NULL, employee_ids=c('all'),year=NULL,verbose=FALSE){
+  df <- employee_ids %>%
     purrr::map(., function(x) paste0('https://api.bamboohr.com/api/gateway.php/propellerpdx/v1/employees/',x,'/tables/customUtilization/')) %>%
     purrr::map(., function(x) httr::GET(x,
                                         httr::add_headers(Accept = "application/json"),

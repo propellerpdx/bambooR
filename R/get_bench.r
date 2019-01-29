@@ -4,6 +4,7 @@
 #'
 #' @param user Bamboo api user id, register in Bamboo "API Keys"
 #' @param password Bamboo login password
+#' @param employee_ids an optional list; specifies the employees for which bench time is requested; defaults to c('all') which gets all employee bench time
 #' @param verbose a logical; indicates if detailed output from httr calls should be provided; default FALSE
 #' @return tbl_df
 #'
@@ -21,20 +22,16 @@
 #' @import purrr
 #' @import dplyr
 #' @importFrom lubridate ymd
-#' @importFrom lubridate ymd_hms
 #' @import stringr
-#' @import jsonlite
+#' @importFrom jsonlite fromJSON
 #' @export
-get_bench <- function(user=NULL,password=NULL,employee_ids=NULL,verbose=FALSE){
-  if(is.null(employee_ids)==T){
-  employee_ids <- bambooR::get_employees(user=user,
-                                      password=password) %>% .$Employee_bambooID}
+get_bench <- function(user=NULL,password=NULL,employee_ids=c('all'),verbose=FALSE){
   df <- employee_ids %>%
     purrr::map(., function(x) paste0('https://api.bamboohr.com/api/gateway.php/propellerpdx/v1/employees/',x,'/tables/customBenchTime')) %>%
     purrr::map(., function(x) httr::GET(x,
-                                      httr::add_headers(Accept = "application/json"),
-                                      httr::authenticate(user=paste0(user), password=paste0(password)),
-                                      config=config(verbose=verbose))) %>%
+                                        httr::add_headers(Accept = "application/json"),
+                                        httr::authenticate(user=paste0(user), password=paste0(password)),
+                                        config=config(verbose=verbose))) %>%
     purrr::map(.,function(x) httr::content(x,as='text',type='json',encoding='UTF-8')) %>%
     purrr::map(.,function(x) jsonlite::fromJSON(x,simplifyDataFrame=T)) %>%
     purrr::flatten_df() %>%
@@ -42,5 +39,24 @@ get_bench <- function(user=NULL,password=NULL,employee_ids=NULL,verbose=FALSE){
     dplyr::mutate_at(dplyr::vars(colnames(df)[stringr::str_detect(names(df),'date')]),dplyr::funs(lubridate::ymd(.))) %>%
     dplyr::mutate_at(dplyr::vars(c('customHours')),dplyr::funs(as.numeric(.))) %>%
     dplyr::rename('Employee_bambooID'='employeeId','Bench_startDate'='customStartdate','Bench_endDate'='customEnddate1','Bench_hoursCap'='customHours')
-  return(df)
+return(df)
 }
+# get_bench <- function(user=NULL,password=NULL,employee_ids=NULL,verbose=FALSE){
+#   if(is.null(employee_ids)==T){
+#   employee_ids <- bambooR::get_employees(user=user,
+#                                       password=password) %>% .$Employee_bambooID}
+#   df <- employee_ids %>%
+#     purrr::map(., function(x) paste0('https://api.bamboohr.com/api/gateway.php/propellerpdx/v1/employees/',x,'/tables/customBenchTime')) %>%
+#     purrr::map(., function(x) httr::GET(x,
+#                                       httr::add_headers(Accept = "application/json"),
+#                                       httr::authenticate(user=paste0(user), password=paste0(password)),
+#                                       config=config(verbose=verbose))) %>%
+#     purrr::map(.,function(x) httr::content(x,as='text',type='json',encoding='UTF-8')) %>%
+#     purrr::map(.,function(x) jsonlite::fromJSON(x,simplifyDataFrame=T)) %>%
+#     purrr::flatten_df() %>%
+#     dplyr::select(-id) %>%
+#     dplyr::mutate_at(dplyr::vars(colnames(df)[stringr::str_detect(names(df),'date')]),dplyr::funs(lubridate::ymd(.))) %>%
+#     dplyr::mutate_at(dplyr::vars(c('customHours')),dplyr::funs(as.numeric(.))) %>%
+#     dplyr::rename('Employee_bambooID'='employeeId','Bench_startDate'='customStartdate','Bench_endDate'='customEnddate1','Bench_hoursCap'='customHours')
+#   return(df)
+# }

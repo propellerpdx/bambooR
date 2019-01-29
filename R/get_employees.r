@@ -23,7 +23,7 @@
 #' @importFrom lubridate ymd
 #' @importFrom lubridate ymd_hms
 #' @import stringr
-#' @import jsonlite
+#' @importFrom jsonlite fromJSON
 #' @export
 get_employees <- function(user=NULL,password=NULL,verbose=FALSE){
   employees <- httr::GET('https://api.bamboohr.com/api/gateway.php/propellerpdx/v1/meta/users/',
