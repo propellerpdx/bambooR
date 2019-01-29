@@ -5,7 +5,8 @@
 \title{Bamboo API get request wrapper}
 \usage{
 get_utilization(user = NULL, password = NULL,
-  employee_ids = c("all"), year = NULL, verbose = FALSE)
+  employee_ids = c("all"), employees = NULL, year = NULL,
+  verbose = FALSE)
 }
 \arguments{
 \item{user}{Bamboo api user id, register in Bamboo "API Keys"}
@@ -13,6 +14,8 @@ get_utilization(user = NULL, password = NULL,
 \item{password}{Bamboo login password}
 
 \item{employee_ids}{an optional list; specifies the employees for which bench time is requested; defaults to c('all') which gets all employee bench time}
+
+\item{employees}{an optional data frame; the employees table returned by get_employees; if not provided, get_employees will be called for the table}
 
 \item{year}{a calendar year; restricts the result set to a particular year if provided; default NULL}
 

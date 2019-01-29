@@ -5,6 +5,7 @@
 #' @param user Bamboo api user id, register in Bamboo "API Keys"
 #' @param password Bamboo login password
 #' @param employee_ids an optional list; specifies the employees for which bench time is requested; defaults to c('all') which gets all employee bench time
+#' @param employees an optional data frame; the employees table returned by get_employees; if not provided, get_employees will be called for the table
 #' @param year a calendar year; restricts the result set to a particular year if provided; default NULL
 #' @param verbose a logical; indicates if detailed output from httr calls should be provided; default FALSE
 #' @return tbl_df
@@ -24,7 +25,7 @@
 #' @import dplyr
 #' @importFrom jsonlite fromJSON
 #' @export
-get_utilization <- function(user=NULL, password=NULL, employee_ids=c('all'),year=NULL,verbose=FALSE){
+get_utilization <- function(user=NULL, password=NULL, employee_ids=c('all'), employees=NULL, year=NULL, verbose=FALSE){
   df <- employee_ids %>%
     purrr::map(., function(x) paste0('https://api.bamboohr.com/api/gateway.php/propellerpdx/v1/employees/',x,'/tables/customUtilization/')) %>%
     purrr::map(., function(x) httr::GET(x,
@@ -43,9 +44,14 @@ get_utilization <- function(user=NULL, password=NULL, employee_ids=c('all'),year
                   primaryUtilizaiton_Proration=as.numeric(stringr::str_replace(customPrimaryUtilizationProration,'%',''))) %>%
     dplyr::rename('Bamboo_utilizationID'='id','Employee_bambooID'='employeeId')
 
+  # Grab the hireDate from the employees table
+  if(isnull(employees)==TRUE){
+    employees <- get_employees(user=user, password=password, verbose=verbose)
+  }
   df <- dplyr::left_join(df,employees %>% dplyr::select(Employee_bambooID,Employee_hireDate)) %>%
     dplyr::select(Bamboo_utilizationID,Employee_bambooID,Employee_hireDate,primaryUtilizaiton_Proration,Year,primaryUtilization_Target,secondaryUtilization_Target,primaryUtilization_Waved,secondaryUtilization_Waved)
 
+  # Filter by year, if provided
   if(is.null(year)==F){
     df <- df %>%
       dplyr::filter(Year==as.numeric(year))
