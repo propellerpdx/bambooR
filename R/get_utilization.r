@@ -45,7 +45,7 @@ get_utilization <- function(user=NULL, password=NULL, employee_ids=c('all'), emp
     dplyr::rename('Bamboo_utilizationID'='id','Employee_bambooID'='employeeId')
 
   # Grab the hireDate from the employees table
-  if(isnull(employees)==TRUE){
+  if(is.null(employees)==TRUE){
     employees <- get_employees(user=user, password=password, verbose=verbose)
   }
   df <- dplyr::left_join(df,employees %>% dplyr::select(Employee_bambooID,Employee_hireDate)) %>%
