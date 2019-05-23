@@ -15,8 +15,6 @@ get_utilization(user = NULL, password = NULL,
 
 \item{employee_ids}{an optional list; specifies the employees for which bench time is requested; defaults to c('all') which gets all employee bench time}
 
-\item{employees}{an optional data frame; the employees table returned by get_employees; if not provided, get_employees will be called for the table}
-
 \item{year}{a calendar year; restricts the result set to a particular year if provided; default NULL}
 
 \item{verbose}{a logical; indicates if detailed output from httr calls should be provided; default FALSE}
