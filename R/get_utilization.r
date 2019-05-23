@@ -41,7 +41,7 @@ get_utilization <- function(user=NULL, password=NULL, employee_ids=c('all'), emp
                   secondaryUtilization_Target=as.numeric(customSecondaryUtilizationTarget),
                   primaryUtilization_Waved=as.numeric(customPrimaryUtilizationWaved),
                   secondaryUtilization_Waved=as.numeric(customSecondaryUtilizationWaved),
-                  primaryUtilizaiton_Proration=as.numeric(stringr::str_replace(customPrimaryUtilizationProration,'%',''))) %>%
+                  primaryUtilization_Proration=as.numeric(stringr::str_replace(customPrimaryUtilizationProration,'%',''))) %>%
     dplyr::rename('Bamboo_utilizationID'='id','Employee_bambooID'='employeeId')
 
   # Grab the hireDate from the employees table
@@ -49,7 +49,15 @@ get_utilization <- function(user=NULL, password=NULL, employee_ids=c('all'), emp
     employees <- get_employees(user=user, password=password, verbose=verbose)
   }
   df <- dplyr::left_join(df,employees %>% dplyr::select(Employee_bambooID,Employee_hireDate)) %>%
-    dplyr::select(Bamboo_utilizationID,Employee_bambooID,Employee_hireDate,primaryUtilizaiton_Proration,Year,primaryUtilization_Target,secondaryUtilization_Target,primaryUtilization_Waved,secondaryUtilization_Waved)
+    dplyr::select(Bamboo_utilizationID,
+                  Employee_bambooID,
+                  Employee_hireDate,
+                  primaryUtilization_Proration,
+                  Year,
+                  primaryUtilization_Target,
+                  secondaryUtilization_Target,
+                  primaryUtilization_Waved,
+                  secondaryUtilization_Waved)
 
   # Filter by year, if provided
   if(is.null(year)==F){
