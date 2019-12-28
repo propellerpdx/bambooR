@@ -6,8 +6,8 @@
 #' @param password Bamboo login password
 #' @param employee_ids an optional list; specifies the employees for which bench
 #'   time is requested; defaults to c('all') which gets all employee bench time
-#' @param year integer; the year for which bench records are desired;
-#'   defaults to the current year
+#' @param year integer; the year for which bench records are desired; optional,
+#'   defaults to NULL
 #' @param verbose a logical; indicates if detailed output from httr calls should
 #'   be provided; default FALSE
 #' @return tbl_df
@@ -27,7 +27,7 @@ get_bench <-
   function(user=NULL,
            password=NULL,
            employee_ids=c('all'),
-           year=lubridate::year(lubridate::today()),
+           year=NULL,
            verbose=FALSE){
   df <-
     employee_ids %>%
@@ -71,14 +71,18 @@ get_bench <-
       'Bench_hoursCap' = 'customHours'
     )
 
-  # Filter to only include records that touch the requested year
+  # Filter to only include records that touch the requested year if a year was
+  # specified
   # The only scenario the below doesn't cover is a situation where the bench
   # record covers the entire year, which seems unrealistic
-  df <-
-    dplyr::filter(
-      df,
-      lubridate::year(Bench_startDate) == year |
-        lubridate::year(Bench_endDate) == year)
+  if(!is.null(year)){
+    df <-
+      dplyr::filter(
+        df,
+        lubridate::year(Bench_startDate) == year |
+          lubridate::year(Bench_endDate) == year |
+          is.na(Bench_endDate))
+  }
 
 return(df)
 }

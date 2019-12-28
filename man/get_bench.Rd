@@ -5,7 +5,7 @@
 \title{Bamboo API get request wrapper}
 \usage{
 get_bench(user = NULL, password = NULL, employee_ids = c("all"),
-  year = lubridate::year(lubridate::today()), verbose = FALSE)
+  year = NULL, verbose = FALSE)
 }
 \arguments{
 \item{user}{Bamboo api user id, register in Bamboo "API Keys"}
@@ -15,8 +15,8 @@ get_bench(user = NULL, password = NULL, employee_ids = c("all"),
 \item{employee_ids}{an optional list; specifies the employees for which bench
 time is requested; defaults to c('all') which gets all employee bench time}
 
-\item{year}{integer; the year for which bench records are desired;
-defaults to the current year}
+\item{year}{integer; the year for which bench records are desired; optional,
+defaults to NULL}
 
 \item{verbose}{a logical; indicates if detailed output from httr calls should
 be provided; default FALSE}
