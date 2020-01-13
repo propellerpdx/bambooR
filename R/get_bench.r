@@ -81,7 +81,8 @@ get_bench <-
         df,
         lubridate::year(Bench_startDate) == year |
           lubridate::year(Bench_endDate) == year |
-          is.na(Bench_endDate))
+          (lubridate::year(Bench_startDate) <= year &
+             is.na(Bench_endDate)))
   }
 
 return(df)
