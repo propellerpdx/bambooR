@@ -64,7 +64,7 @@ get_pto <- function(user=NULL,
     time_off %>%
       purrr::map(.,'dates') %>%
       purrr::map_df(., function(x) unlist(x) %>%
-                        dplyr::as_data_frame(.)) %>%
+                        tibble::enframe('dates')) %>%
                         dplyr::rename('Hours'='value')
     )
 
