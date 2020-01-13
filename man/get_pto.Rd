@@ -4,14 +4,21 @@
 \alias{get_pto}
 \title{Bamboo API get request wrapper}
 \usage{
-get_pto(user = NULL, password = NULL, verbose = FALSE)
+get_pto(user = NULL, password = NULL, startDate = NULL,
+  endDate = NULL, verbose = FALSE)
 }
 \arguments{
 \item{user}{Bamboo api user id, register in Bamboo "API Keys"}
 
 \item{password}{Bamboo login password}
 
-\item{verbose}{a logical; indicates if detailed output from httr calls should be provided; default FALSE}
+\item{startDate}{date; start date of the range for which PTO records are desired; *required*; defaults to NULL}
+
+\item{endDate}{date; end date of the range for which PTO records are desired; *required*; defaults to NULL}
+
+\item{verbose}{logical; indicates if detailed output from httr calls should be provided; default FALSE}
+
+\item{year}{int; year for which PTO records are desired; defaults to current year}
 }
 \value{
 tbl_df
@@ -20,10 +27,11 @@ tbl_df
 Submits a get request to retrieve the all employees time off by date
 }
 \examples{
-
+\dontrun{
 user <- 'your_api_user'
 password <- 'your_password'
 employees <- get_pto(user=user,password=password)
+}
 
 }
 \references{
