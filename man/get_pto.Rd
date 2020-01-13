@@ -30,7 +30,9 @@ Submits a get request to retrieve the all employees time off by date
 \dontrun{
 user <- 'your_api_user'
 password <- 'your_password'
-employees <- get_pto(user=user,password=password)
+startDate = lubridate::ymd("20190101")
+endDate = lubridate::ymd("20191231")
+employees <- get_pto(user = user, password = password, startDate = startDate, endDate = endDate)
 }
 
 }
