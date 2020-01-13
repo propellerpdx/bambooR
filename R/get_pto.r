@@ -58,7 +58,7 @@ get_pto <- function(user=NULL,
         .x = .,
         .y = time_off %>% purrr::map(., `[`, c('id', 'employeeId')),
         function(x = .x, y = .y) unlist(x) %>%
-          dplyr::as_data_frame(.) %>%
+          tibble::enframe('id') %>%
           dplyr::mutate(id = unlist(y)[1], employeeId = unlist(y)[2])) %>%
       dplyr::rename('Date' = 'value'),
     time_off %>%
