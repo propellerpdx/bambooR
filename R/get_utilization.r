@@ -5,7 +5,6 @@
 #' @param user Bamboo api user id, register in Bamboo "API Keys"
 #' @param password Bamboo login password
 #' @param employee_ids an optional list; specifies the employees for which bench time is requested; defaults to c('all') which gets all employee bench time
-#' @param employees an optional data frame; the employees table returned by get_employees; if not provided, get_employees will be called for the table
 #' @param year a calendar year; restricts the result set to a particular year if provided; default NULL
 #' @param verbose a logical; indicates if detailed output from httr calls should be provided; default FALSE
 #' @return tbl_df
@@ -44,14 +43,10 @@ get_utilization <- function(user=NULL, password=NULL, employee_ids=c('all'), emp
                   primaryUtilization_Proration=as.numeric(stringr::str_replace(customPrimaryUtilizationProration,'%',''))) %>%
     dplyr::rename('Bamboo_utilizationID'='id','Employee_bambooID'='employeeId')
 
-  # Grab the hireDate from the employees table
-  if(is.null(employees)==TRUE){
-    employees <- get_employees(user=user, password=password, verbose=verbose)
-  }
-  df <- dplyr::left_join(df,employees %>% dplyr::select(Employee_bambooID,Employee_hireDate)) %>%
+  df <-
+    df %>%
     dplyr::select(Bamboo_utilizationID,
                   Employee_bambooID,
-                  Employee_hireDate,
                   primaryUtilization_Proration,
                   Year,
                   primaryUtilization_Target,
