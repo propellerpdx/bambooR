@@ -25,6 +25,7 @@
 #' @import dplyr
 #' @import tibble
 #' @import purrr
+#' @import tidyr
 #' @importFrom jsonlite fromJSON
 #' @export
 get_table <- function(requested_table_alias = NULL, user = NULL, password = NULL, verbose = FALSE)
