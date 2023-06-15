@@ -109,29 +109,26 @@ get_table <- function(requested_table_alias = NULL, user = NULL, password = NULL
       dplyr::filter(alias %in% names(table_data))
     
     #for some reason certain tables are now coming as list values, if they are then unnest them
-    if("list" %in% sapply(table_data, class)) {
-      table_data <-
-        table_data %>% 
-        tidyr::unnest(cols = names(table_data))
-    }
+    table_data <-
+      table_data %>% 
+      tidyr::unnest(cols = names(table_data))
     
-    str(table_data)
   
     #finally coerce the return values to R data types, cleaning up weird BambooHR default choices (like null dates are set to 000-00-00)
-#    table_data %>%
-#      purrr::modify_at(dplyr::vars(as.character(table_information[table_information$type == "date",]$alias)),~ ifelse(.=="0000-00-00" | .=="NULL",NA,.)) %>%
-#      dplyr::mutate_at(dplyr::vars(as.character(table_information[table_information$type == "date",]$alias)), as.Date) %>%
-#      dplyr::mutate_at(dplyr::vars(as.character(table_information[table_information$type == "int",]$alias)), as.integer) %>%
-#      purrr::modify_at(dplyr::vars(as.character(table_information[table_information$type == "list",]$alias)), ~ ifelse(.=="",NA,.)) %>%
-#      dplyr::mutate_at(dplyr::vars(as.character(table_information[table_information$type == "list",]$alias)), as.factor) %>%
-#      dplyr::mutate_at(dplyr::vars(as.character(table_information[table_information$type == "currency",]$alias)), ~ sub("USD", "", .)) %>%
-#      dplyr::mutate_at(dplyr::vars(as.character(table_information[table_information$type == "currency",]$alias)), as.numeric) %>%
-#      dplyr::mutate_at(dplyr::vars(as.character(table_information[table_information$type == "percentage",]$alias)), ~ sub("%", "", .)) %>%
-#      dplyr::mutate_at(dplyr::vars(as.character(table_information[table_information$type == "percentage",]$alias)), ~ as.numeric(.)/100) %>%
-#      dplyr::mutate_at(dplyr::vars(as.character(table_information[table_information$type == "timestamp",]$alias)), ~ paste(substr(.,0,10),substr(.,12,19))) %>%
-#      dplyr::mutate_at(dplyr::vars(as.character(table_information[table_information$type == "timestamp",]$alias)), as.POSIXct) %>%
-#      dplyr::mutate_at(dplyr::vars(as.character(table_information[table_information$type == "text",]$alias)), as.character) %>%
-#      dplyr::mutate_at(dplyr::vars(as.character(table_information[table_information$type == "textarea",]$alias)), as.character) %>%
-#      dplyr::mutate_at(dplyr::vars(as.character(table_information[table_information$type == "bool",]$alias)), as.logical)
+    table_data %>%
+      purrr::modify_at(dplyr::vars(as.character(table_information[table_information$type == "date",]$alias)),~ ifelse(.=="0000-00-00" | .=="NULL",NA,.)) %>%
+      dplyr::mutate_at(dplyr::vars(as.character(table_information[table_information$type == "date",]$alias)), as.Date) %>%
+      dplyr::mutate_at(dplyr::vars(as.character(table_information[table_information$type == "int",]$alias)), as.integer) %>%
+      purrr::modify_at(dplyr::vars(as.character(table_information[table_information$type == "list",]$alias)), ~ ifelse(.=="",NA,.)) %>%
+      dplyr::mutate_at(dplyr::vars(as.character(table_information[table_information$type == "list",]$alias)), as.factor) %>%
+      dplyr::mutate_at(dplyr::vars(as.character(table_information[table_information$type == "currency",]$alias)), ~ sub("USD", "", .)) %>%
+      dplyr::mutate_at(dplyr::vars(as.character(table_information[table_information$type == "currency",]$alias)), as.numeric) %>%
+      dplyr::mutate_at(dplyr::vars(as.character(table_information[table_information$type == "percentage",]$alias)), ~ sub("%", "", .)) %>%
+      dplyr::mutate_at(dplyr::vars(as.character(table_information[table_information$type == "percentage",]$alias)), ~ as.numeric(.)/100) %>%
+     dplyr::mutate_at(dplyr::vars(as.character(table_information[table_information$type == "timestamp",]$alias)), ~ paste(substr(.,0,10),substr(.,12,19))) %>%
+      dplyr::mutate_at(dplyr::vars(as.character(table_information[table_information$type == "timestamp",]$alias)), as.POSIXct) %>%
+      dplyr::mutate_at(dplyr::vars(as.character(table_information[table_information$type == "text",]$alias)), as.character) %>%
+      dplyr::mutate_at(dplyr::vars(as.character(table_information[table_information$type == "textarea",]$alias)), as.character) %>%
+      dplyr::mutate_at(dplyr::vars(as.character(table_information[table_information$type == "bool",]$alias)), as.logical)
   }
 }
