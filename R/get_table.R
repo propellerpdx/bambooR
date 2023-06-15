@@ -109,7 +109,7 @@ get_table <- function(requested_table_alias = NULL, user = NULL, password = NULL
 
     #finally coerce the return values to R data types, cleaning up weird BambooHR default choices (like null dates are set to 000-00-00)
     table_data %>%
-      purrr::modify_at(dplyr::vars(as.character(table_information[table_information$type == "date",]$alias)),~ ifelse(.=="0000-00-00",NA,.)) %>%
+      purrr::modify_at(dplyr::vars(as.character(table_information[table_information$type == "date",]$alias)),~ ifelse(.=="0000-00-00" | .=="NULL",NA,.)) %>%
       dplyr::mutate_at(dplyr::vars(as.character(table_information[table_information$type == "date",]$alias)), as.Date) %>%
       dplyr::mutate_at(dplyr::vars(as.character(table_information[table_information$type == "int",]$alias)), as.integer) %>%
       purrr::modify_at(dplyr::vars(as.character(table_information[table_information$type == "list",]$alias)), ~ ifelse(.=="",NA,.)) %>%
